@@ -3,6 +3,7 @@
 ## 간단한 지갑생성 사이트 만들어보기
 
 - 간단한 프론트 페이지도 같이 만들어 볼 예정입니다.
+- ![완성 페이지](./image/결과.jpg)
   
 - 기술스택 : nextjs, axios, eth-lightwallet
 
@@ -20,7 +21,7 @@ yarn dev
 ## 2. ./pages/api 경로에 newMnemonic.js, newWallet.js 파일 생성
 ![](./image/폴더구조.jpg)
 
-## 3. 생성된 파일에 내용 입력
+## 3. 나모닉 코드 및 지갑 생성
 
 ```javascript
 // newMnemonic.js
@@ -69,12 +70,43 @@ const newWallet = (req, res) => {
 }
 ```
 
-## 간단한 테스트용 리액트 파일 만들기
+## 4. 간단한 테스트용 리액트 파일 만들기
 
+- [component 위치](https://github.com/jsc7727/mnemonic-with-next/tree/main/components)
+
+
+## 5. 실행
+![실행 해보기](./image/움짤.gif)
+
+
+## 후기
+요즘 next를 공부하고 있기에 접목해 보고자 시작하게 되었다.
+
+서버를 재부팅 한 후 api로 request를 보내면 첫번째만 아래와 같은 오류를 뿜어냈다.
+![오류](./image/오류.jpg)
+
+찾아보니 eth-lightwallet을 설치할 때 bitcore-lib가 같이 설치된다.
+![](./image/종속성%20패키지.jpg)
+node_modules\bitcore-lib\index.js 파일을 열어보면 아래와 같은 코드가 있다.
 ```javascript
-
-
-
+// module information
+bitcore.version = 'v' + require('./package.json').version;
+bitcore.versionGuard = function(version) {
+  if (version !== undefined) {
+    var message = 'More than one instance of bitcore-lib found. ' +
+      'Please make sure to require bitcore-lib and check that submodules do' +
+      ' not also include their own bitcore-lib dependency.';
+    throw new Error(message);
+  }
+};
+bitcore.versionGuard(global._bitcore);
+global._bitcore = bitcore.version;
 ```
+next서버의 특성상 bitcore 가 중복으로 불러온것인지 
 
+싱글톤으로 구현했는데도 처음에 오류가 발생하여 난감했다.
+
+시간이되면 마저 오류를 찾아볼 예정이다.
+
+그 외에는 [eth-lightwallet 공식문서](https://github.com/ConsenSys/eth-lightwallet)에 잘 나와있어서 어려움 없이 프로젝트를 마무리 했다.
 
