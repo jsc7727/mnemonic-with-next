@@ -1,34 +1,78 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# section4 나모닉 코드 지갑 with Nextjs
 
-## Getting Started
+## 간단한 지갑생성 사이트 만들어보기
 
-First, run the development server:
+- 간단한 프론트 페이지도 같이 만들어 볼 예정입니다.
+  
+- 기술스택 : nextjs, axios, eth-lightwallet
 
-```bash
-npm run dev
-# or
+- 환경 : node 16.1.0, 나머지는 package.json 참조
+- **node 환경이 17.8.0 일 경우** 에러발생!! 자세한 건 아래 주소 참조
+    - [error:0308010C:digital envelope routines::unsupported"](https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported)
+- [eth-lightwallet 공식문서](https://github.com/ConsenSys/eth-lightwallet)
+## 1. 기본 패키지 설치
+```javascript
+npx create-next-app@latest
+yarn add axios eth-lightwallet
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 2. ./pages/api 경로에 newMnemonic.js, newWallet.js 파일 생성
+![](./image/폴더구조.jpg)
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## 3. 생성된 파일에 내용 입력
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```javascript
+// newMnemonic.js
+...
+mnemonic = lightwallet.keystore.generateRandomSeed();
+// 니모닉 코드를 생성 하기 위해 eth-lightwallet라이브러리의
+// generateRandomSeed() 함수를 사용했다.
+...
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-## Learn More
+```javascript
+// newWallet.js
 
-To learn more about Next.js, take a look at the following resources:
+const newWallet = (req, res) => {
+    ...
+    const { body: { password, mnemonic } = {} } = req // 인자를 받고
+    ...
+    try {
+        lightwallet.keystore.createVault( // keystore 생성 함수
+            {
+                password: password, // 비밀번호
+                seedPhrase: mnemonic, // 니모닉 코드
+                hdPathString: "m/0'/0'/0'" // HD derivation
+            }, (err, keyStore) => {
+                keyStore.keyFromPassword(password, function (err, pwDerivedKey) {
+                    //이 인스턴스 메소드는 내부적으로 구성된 솔트를 사용한다.
+                    //키 저장소를 암호화/복호화하는 데 사용되는 유형의 대칭 키를 생성한다.
+                    keyStore.generateNewAddress(pwDerivedKey, 1);
+                    // 자격 증명 모음에서 추가 내부 주소/개인 키 쌍을 생성할 수 있다.
+                    const address = (keyStore.getAddresses()).toString();
+                    // 현재 키 저장소에 저장된 16진수 문자열 주소 목록을 반환한다.
+                    const keystore = keyStore.serialize();
+                    // 현재 키 저장소 개체를 JSON 인코딩 문자열로 변환 후 해당 문자열을 반환한다.
+                    fs.writeFile('wallet.json', keystore, function (err, data) {
+                        if (err) {
+                            return res.json({ code: 999, message: "실패" });
+                        } else {
+                            return res.json({ address, code: 1, message: "성공" });
+                        }
+                    });
+                });
+            }
+        )
+    }
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 간단한 테스트용 리액트 파일 만들기
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```javascript
 
-## Deploy on Vercel
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

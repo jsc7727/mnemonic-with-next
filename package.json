@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "axios": "^0.26.1",
+    "eth-lightwallet": "^4.0.0",
     "next": "12.1.4",
-    "react": "18.0.0",
+    "react": "^18.0.0",
     "react-dom": "18.0.0"
   },
   "devDependencies": {
