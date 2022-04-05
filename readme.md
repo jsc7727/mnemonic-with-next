@@ -1,4 +1,4 @@
-# section4 나모닉 코드 지갑 with Nextjs
+# 🔐 section4 나모닉 코드 지갑 with Nextjs
 
 ## 간단한 지갑생성 사이트 만들어보기
 
@@ -57,6 +57,7 @@ const newWallet = (req, res) => {
                     const keystore = keyStore.serialize();
                     // 현재 키 저장소 개체를 JSON 인코딩 문자열로 변환 후 해당 문자열을 반환한다.
                     fs.writeFile('wallet.json', keystore, function (err, data) {
+                        // file system을 사용하여  wallet.json 파일에 keystore 데이터를 저장한다.
                         if (err) {
                             return res.json({ code: 999, message: "실패" });
                         } else {
@@ -82,7 +83,7 @@ const newWallet = (req, res) => {
 ## 후기
 요즘 next를 공부하고 있기에 접목해 보고자 시작하게 되었다.
 
-서버를 재부팅 한 후 api로 request를 보내면 첫번째만 아래와 같은 오류를 뿜어냈다.
+서버를 재부팅 한 후 api로 request를 보내면 첫번째만 아래와 같은 오류를 뿜어냈다. 😂😂
 ![오류](./image/오류.jpg)
 
 찾아보니 eth-lightwallet을 설치할 때 bitcore-lib가 같이 설치된다.
@@ -104,9 +105,9 @@ global._bitcore = bitcore.version;
 ```
 next서버의 특성상 bitcore 가 중복으로 불러온것인지 
 
-싱글톤으로 구현했는데도 처음에 오류가 발생하여 난감했다.
+싱글톤으로 구현했는데도 매번 서버 재부팅시에 오류가 발생하여 난감했다.
 
-시간이되면 마저 오류를 찾아볼 예정이다.
+아직 해결하지 못했고 시간이되면 마저 오류를 찾아볼 예정이다.
 
 그 외에는 [eth-lightwallet 공식문서](https://github.com/ConsenSys/eth-lightwallet)에 잘 나와있어서 어려움 없이 프로젝트를 마무리 했다.
 
